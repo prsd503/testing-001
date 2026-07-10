@@ -97,34 +97,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         snapshot.forEach((d) => {
-            const data = d.data();
-            const waLink = data.mobileNumber ? `https://wa.me/${data.mobileNumber.replace(/\D/g, '')}?text= (Using: Owl-Watch) Hello, regarding vehicle ${data.vehicleNumber}` : "#";
-            container.innerHTML += `
-                <div style="background:#fdf6e3; padding:10px; border-radius:10px; margin-bottom:10px; text-align:left; border: 1px solid #8d6e63;">
-                    <p><b>${data.vehicleNumber}</b> | Flat/Name: ${data.flatNumber}</p>
-                    <a href="${waLink}" target="_blank" style="background:#25d366; color:white; padding:5px 8px; border-radius:5px; text-decoration:none; font-size:0.8rem;">WhatsApp</a>
-                    <button onclick="editEntry('${data.vehicleNumber}', '${data.flatNumber}', '${data.mobileNumber || ''}', '${d.id}')" style="background:#6d4c41; font-size:0.8rem;">Edit</button>
-                    <button onclick="deleteEntry('${d.id}')" style="background:#d32f2f; font-size:0.8rem;">Delete</button>
-                </div>`;
-        });
+    const data = d.data();
+    const type = data.vehicleType || "N/A"; // Shows vehicle type
+    const waLink = data.mobileNumber ? `https://wa.me/${data.mobileNumber.replace(/\D/g, '')}?text= (Using: Owl-Watch)Hello, query regarding vehicle ${data.vehicleNumber}` : "#";
+    
+    container.innerHTML += `
+    <div style="background:#fdf6e3; padding:10px; border-radius:10px; margin-bottom:10px; text-align:left; border: 1px solid #8d6e63;">
+        <p><b>${data.vehicleNumber}</b> (${type}) | Flat: ${data.flatNumber}</p>
+        
+        <!-- Updated WhatsApp Button -->
+        <a href="${waLink}" target="_blank" style="background:#25d366; color:white; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:0.8rem; display:inline-block; margin-bottom:5px;">WhatsApp</a>
+        
+        <button onclick="editEntry('${data.vehicleNumber}', '${data.flatNumber}', '${data.mobileNumber || ''}', '${d.id}')" style="background:#6d4c41; font-size:0.8rem; padding:8px 12px;">Edit</button>
+        <button onclick="deleteEntry('${d.id}')" style="background:#d32f2f; font-size:0.8rem; padding:8px 12px;">Delete</button>
+    </div>`;
+
+});
+
     });
 
     // 4. Save/Update
     document.getElementById('saveBtn')?.addEventListener('click', async () => {
-        const v = document.getElementById('vNum').value.trim().toUpperCase();
-        const f = document.getElementById('fNum').value.trim();
-        const m = document.getElementById('mNum').value.trim();
-        if (!v || !f) return window.showModal("Fill fields.");
-        if (!editingDocId) {
-            if (await isVehicleExists(v, assignedSociety)) return window.showModal("Vehicle already registered.");
-            await addDoc(collection(db, "vehicles"), { vehicleNumber: v, flatNumber: f, mobileNumber: m, societyName: assignedSociety });
-            window.showModal("Added!");
-        } else {
-            await updateDoc(doc(db, "vehicles", editingDocId), { vehicleNumber: v, flatNumber: f, mobileNumber: m });
-            window.showModal("Updated!");
-            editingDocId = null;
-        }
-    });
+    const v = document.getElementById('vNum').value.trim().toUpperCase();
+    const f = document.getElementById('fNum').value.trim();
+    const m = document.getElementById('mNum').value.trim();
+    const type = document.getElementById('vType').value; // Get the dropdown value
+
+    if (!v || !f) return window.showModal("Fill fields.");
+
+    if (!editingDocId) {
+        if (await isVehicleExists(v, assignedSociety)) return window.showModal("Vehicle exists!");
+        await addDoc(collection(db, "vehicles"), { 
+            vehicleNumber: v, flatNumber: f, mobileNumber: m, vehicleType: type, societyName: assignedSociety 
+        });
+        window.showModal("Added!");
+    } else {
+        await updateDoc(doc(db, "vehicles", editingDocId), { 
+            vehicleNumber: v, flatNumber: f, mobileNumber: m, vehicleType: type 
+        });
+        window.showModal("Updated!");
+        editingDocId = null;
+        document.getElementById('saveBtn').innerText = "Save to Registry";
+    }
+});
+
 
     // 5. Bulk Management
     document.getElementById('importBtn')?.addEventListener('click', () => {
@@ -132,19 +148,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!file) return window.showModal("Select file.");
         const reader = new FileReader();
         reader.onload = async (e) => {
-            const rows = e.target.result.split('\n').slice(1);
-            const batch = writeBatch(db);
-            let count = 0;
-            for (const row of rows) {
-                const c = row.split(',');
-                if (c.length >= 2 && !(await isVehicleExists(c[0].trim().toUpperCase(), assignedSociety))) {
-                    batch.set(doc(collection(db, "vehicles")), { vehicleNumber: c[0].trim().toUpperCase(), flatNumber: c[1].trim(), mobileNumber: c[2]?.trim() || "", societyName: assignedSociety });
-                    count++;
-                }
+    const rows = e.target.result.split('\n').slice(1);
+    const batch = writeBatch(db);
+    let count = 0;
+
+    for (const row of rows) {
+        const c = row.split(',');
+        if (c.length >= 2) {
+            const vNum = c[0].trim().toUpperCase();
+            // Use the 4th column (index 3) for type, default to "2-Wheeler" if empty
+            const vType = c[3]?.trim() || "2-Wheeler"; 
+            
+            if (!(await isVehicleExists(vNum, assignedSociety))) {
+                batch.set(doc(collection(db, "vehicles")), { 
+                    vehicleNumber: vNum, 
+                    flatNumber: c[1].trim(), 
+                    mobileNumber: c[2]?.trim() || "", 
+                    vehicleType: vType, // Save new field
+                    societyName: assignedSociety 
+                });
+                count++;
             }
-            await batch.commit();
-            window.showModal(`Imported ${count} new vehicles.`);
-        };
+        }
+    }
+    await batch.commit();
+    window.showModal(`Imported ${count} new vehicles.`);
+};
+
         reader.readAsText(file);
     });
 
@@ -170,13 +200,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('downloadTemplateBtn')?.addEventListener('click', () => {
-        window.downloadCSV("VehicleNumber,FlatNumber/Name,MobileNumber\n", "Vehicle_Template.csv");
-    });
+    // Added 'VehicleType' header
+    window.downloadCSV("VehicleNumber,FlatNumber/Name,MobileNumber,VehicleType\n", "Vehicle_Template.csv");
+});
+
 
     document.getElementById('exportBtn')?.addEventListener('click', async () => {
-        const snapshot = await getDocs(query(collection(db, "vehicles"), where("societyName", "==", assignedSociety)));
-        let csv = "VehicleNumber,FlatNumber,MobileNumber\n";
-        snapshot.forEach(d => { const dt = d.data(); csv += `${dt.vehicleNumber},${dt.flatNumber},${dt.mobileNumber || ''}\n`; });
-        window.downloadCSV(csv, "Vehicles.csv");
+    const snapshot = await getDocs(query(collection(db, "vehicles"), where("societyName", "==", assignedSociety)));
+    // Updated header
+    let csv = "VehicleNumber,FlatNumber,MobileNumber,VehicleType\n"; 
+    snapshot.forEach(d => { 
+        const dt = d.data(); 
+        // Included vehicleType
+        csv += `${dt.vehicleNumber},${dt.flatNumber},${dt.mobileNumber || ''},${dt.vehicleType || '2-Wheeler'}\n`; 
     });
+    window.downloadCSV(csv, "Vehicles.csv");
+});
+
 });
