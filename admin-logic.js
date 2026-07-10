@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('exportBtn')?.addEventListener('click', async () => {
     const snapshot = await getDocs(query(collection(db, "vehicles"), where("societyName", "==", assignedSociety)));
     // Updated header
-    let csv = "VehicleNumber,FlatNumber,MobileNumber,VehicleType\n"; 
+    let csv = "VehicleNumber,FlatNumber/Name,MobileNumber,VehicleType\n"; 
     snapshot.forEach(d => { 
         const dt = d.data(); 
         // Included vehicleType
