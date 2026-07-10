@@ -24,6 +24,43 @@
         <h2>Admin Login</h2>
         <input type="email" id="email" placeholder="Email"><input type="password" id="pass" placeholder="Password">
         <button id="loginBtn">Login</button>
+        
+<hr style="border: 0; border-top: 1px solid #dcdde1; margin: 20px 0;">
+
+<div style="text-align: center; padding-bottom: 30px;">
+        <a href="https://wa.me/919033406816?text=Hi! I would like to register my society/organization on Owl-Watch." 
+           class="contact-btn" target="_blank">
+           Register Your Society/Organization
+        </a>
+    </div>
+        
+<div style="text-align: center; padding-bottom: 30px;">
+        <a href="https://prsd503.github.io/Athena/userguide.html" 
+           class="contact-btn" target="_blank">
+           Read Admin Portal User Guide
+        </a>
+    </div>
+        
+        
+ <div style="text-align: center; padding-bottom: 30px;">
+        <a href="https://prsd503.github.io/Athena/agreement.html" 
+           class="contact-btn" target="_blank">
+           Service Agreement
+        </a>
+    </div>
+
+        
+            <div style="text-align: center; padding-bottom: 30px;">
+        <a href="https://prsd503.github.io/Athena/" 
+           >
+           <b>Back to HOME</b>
+        </a>
+    </div>
+        
+ <br>
+        
+ 
+        
     </div>
     <div class="card" id="search-section" style="display:none;">
         <h2>Search & Manage</h2>
@@ -34,17 +71,27 @@
         
     </div>
     <div class="card" id="data-section" style="display:none;">
+        
         <h2>Add Vehicle</h2>
-        <input type="text" id="vNum" placeholder="Vehicle Number"><input type="text" id="fNum" placeholder="Flat Number"><input type="text" id="mNum" placeholder="Mobile Number">
-        <button id="saveBtn">Save to Registry</button>
-  
+<input type="text" id="vNum" placeholder="Vehicle Number">
+<input type="text" id="fNum" placeholder="Flat Number">
+<input type="text" id="mNum" placeholder="Mobile Number">
+
+<select id="vType" style="width: 85%; padding: 10px; border: 2px solid #8d6e63; border-radius: 10px; font-size: 1.2rem; margin-bottom: 10px;">
+    <option value="2-Wheeler">2-Wheeler</option>
+    <option value="3-Wheeler">3-Wheeler</option>
+    <option value="4-Wheeler">4-Wheeler</option>
+</select>
+
+<button id="saveBtn">Save to Registry</button>
+
         <hr style="margin:20px 0;">
         <h3>Bulk Management</h3>
         <input type="file" id="excelInput" accept=".csv">
         <button id="importBtn">Bulk Import CSV</button>
         <button id="downloadTemplateBtn" style="background:#6d4c41;">Download CSV Template</button>
-        <button id="exportBtn" style="background:#25D366;">Download All as CSV</button>
-        <button id="bulkDeleteBtn" style="background:#d32f2f;">Bulk Delete CSV</button>
+        <!-- <button id="exportBtn" style="background:#25D366;">Download All as CSV</button>
+        <button id="bulkDeleteBtn" style="background:#d32f2f;">Bulk Delete CSV</button> -->
         
     
     </div>
@@ -56,5 +103,12 @@
         </div>
     </div>
     <script type="module" src="admin-logic.js"></script>
+   
+
+   
+                
+        
+         
+    
 </body>
 </html>
