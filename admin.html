@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <title>Owl Watch | Admin</title>
+    <style>
+
+        #customModal { z-index: 1000; }
+#customModal > div { border: 2px solid #8d6e63; text-align: center; }
+        
+        body { font-family: 'Caveat', cursive; background: #fdf6e3; color: #5d4037; text-align: center; padding: 20px; }
+        .card { background: #fff; padding: 20px; border-radius: 20px; border: 2px solid #8d6e63; box-shadow: 5px 5px 0px #8d6e63; max-width: 400px; margin: auto; margin-bottom: 25px; }
+        input { width: 85%; padding: 10px; border: 2px solid #8d6e63; border-radius: 10px; font-size: 1.2rem; margin-bottom: 10px; box-sizing: border-box; }
+        button { background: #8d6e63; color: white; border: none; padding: 10px 25px; border-radius: 10px; cursor: pointer; font-size: 1.2rem; margin-top: 10px; border: 2px solid #5d4037; }
+        button:hover { background: #5d4037; }
+        #admin-results { margin-top: 15px; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="card"><h1>Owl Watch 🦉</h1><p>Admin Portal</p></div>
+    <div class="card" id="login-section">
+        <h2>Admin Login</h2>
+        <input type="email" id="email" placeholder="Email"><input type="password" id="pass" placeholder="Password">
+        <button id="loginBtn">Login</button>
+    </div>
+    <div class="card" id="search-section" style="display:none;">
+        <h2>Search & Manage</h2>
+        <input type="text" id="adminSearch" placeholder="Enter Vehicle Number">
+        <button id="adminSearchBtn">Search</button>
+        <button id="logoutBtn" style="background:#d32f2f;">Logout</button>
+       <div id="admin-results"></div>
+        
+    </div>
+    <div class="card" id="data-section" style="display:none;">
+        <h2>Add Vehicle</h2>
+        <input type="text" id="vNum" placeholder="Vehicle Number"><input type="text" id="fNum" placeholder="Flat Number"><input type="text" id="mNum" placeholder="Mobile Number">
+        <button id="saveBtn">Save to Registry</button>
+  
+        <hr style="margin:20px 0;">
+        <h3>Bulk Management</h3>
+        <input type="file" id="excelInput" accept=".csv">
+        <button id="importBtn">Bulk Import CSV</button>
+        <button id="downloadTemplateBtn" style="background:#6d4c41;">Download CSV Template</button>
+        <button id="exportBtn" style="background:#25D366;">Download All as CSV</button>
+        <button id="bulkDeleteBtn" style="background:#d32f2f;">Bulk Delete CSV</button>
+        
+    
+    </div>
+    <div id="customModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+        <div style="background:white; margin: 20% auto; padding:20px; width:80%; max-width:300px; border-radius:20px;">
+            <p id="modalMessage"></p><button onclick="closeModal()">Close</button>
+       <button id="confirmDeleteBtn" onclick="window.confirmDelete()" style="display:none; background:#d32f2f; color:white;">Confirm Delete</button>
+            
+        </div>
+    </div>
+    <script type="module" src="admin-logic.js"></script>
+</body>
+</html>
